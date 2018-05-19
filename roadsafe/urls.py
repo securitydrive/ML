@@ -19,5 +19,5 @@ import road.views as view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/test/<str:user_id>', view.result)
+    path('api/test', view.k_means)
 ]

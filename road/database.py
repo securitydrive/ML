@@ -17,9 +17,9 @@ class DataBase(object):
         """
         print("connecting...")
         connect = pymysql.connect(user='root',
-                                  password='528LcT528',
-                                  host='127.0.0.1',
-                                  database='RoadSafe',
+                                  password='1203',
+                                  host='120.24.90.180',
+                                  database='app_bak',
                                   use_unicode=True)
         cur = connect.cursor()
         print("database connect success")

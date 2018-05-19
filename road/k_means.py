@@ -14,7 +14,8 @@ def load_data(car_id):
     """
     db = DataBase()
     cur, connect = db.connect_db()
-    sql = 'SELECT * FROM `app_data_store` WHERE car_id = ' + car_id
+    sql = "SELECT * FROM `app_data_store` WHERE car_id = \'" + str(car_id) + "\'"
+    print(sql)
     query_res = db.query_data_set(cur=cur, query=sql)
     dataframe = pd.DataFrame(list(query_res))
     dataframe.columns = ['id', 'data_id', 'long', 'lat', 'car_id', 'car_speed', 'car_acc', 'gas_use', 'created_at',
@@ -50,6 +51,7 @@ def result(car_id):
     :param car_id:
     :return:
     """
+    print(car_id)
     data = load_data(car_id)
     location = np.array([data['long'].values, data['lat'].values]).astype("float64").transpose()
     data = data[['car_speed', 'car_acc']]
