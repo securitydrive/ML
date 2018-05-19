@@ -2,6 +2,7 @@ import sklearn.preprocessing as pp
 from sklearn import decomposition
 from sklearn import cluster
 import numpy as np
+import pandas as pd
 from road.database import DataBase
 
 
@@ -11,10 +12,14 @@ def load_data(car_id):
     :param car_id:
     :return: 返回从数据库中取出的数据
     """
-    sql = 'SELECT long, lat, car_speed, car_acc FROM `app_data_store` WHERE car_id = ' + car_id
     db = DataBase()
     cur, connect = db.connect_db()
-    return db.query_data_set(cur=cur, query=sql)
+    sql = 'SELECT * FROM `app_data_store` WHERE car_id = ' + car_id
+    query_res = db.query_data_set(cur=cur, query=sql)
+    dataframe = pd.DataFrame(list(query_res))
+    dataframe.columns = ['id', 'data_id', 'long', 'lat', 'car_id', 'car_speed', 'car_acc', 'gas_use', 'created_at',
+                         'updated_at']
+    return dataframe
 
 
 def transforms(data):
@@ -45,18 +50,13 @@ def result(car_id):
     :param car_id:
     :return:
     """
-    query_res = load_data(car_id)
-
-    """
-    你们自己处理的数据转换
-    """
-
-    location = np.array([query_res['long'].values, query_res['lat'].values]).astype("float64").transpose()
-    data = query_res[['car_speed', 'car_acc']]
+    data = load_data(car_id)
+    location = np.array([data['long'].values, data['lat'].values]).astype("float64").transpose()
+    data = data[['car_speed', 'car_acc']]
     data = transforms(data)
 
-    feature_label = data_pca(data=data, stand=0.01)
-    data = np.delete(data, feature_label, axis=1)
+    # feature_label = data_pca(data=data, stand=0.01)
+    # data = np.delete(data, feature_label, axis=1)
     labels = k_means_cluster(data)
 
     abnormal_id = 0 if 2 * np.sum(labels) > len(labels) else 1  # 两类中少的判为异常类
@@ -67,3 +67,4 @@ def result(car_id):
         if labels[i] == abnormal_id:
             res_data['coordinate'].append({'long': location[i][0], 'lat': location[i][1]})
 
+    return res_data
